@@ -1,10 +1,6 @@
 {
-  "functions": {
-    "api/specs.js": {
-      "runtime": "@vercel/node@3.0.0"
-    }
-  },
   "rewrites": [
+    { "source": "/api/specs", "destination": "/api/specs.js" },
     { "source": "/(.*)", "destination": "/public/index.html" }
   ]
 }
