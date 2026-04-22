@@ -75,3 +75,4 @@ Necesito específicamente los datos de dimensiones de hueco de instalación, esp
     });
   }
 }
+export const config = { runtime: 'edge' };
