@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Basil Kitchens — Specs Técnicas</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0F1117;
+      color: #fff;
+      font-family: 'Georgia', serif;
+      min-height: 100vh;
+    }
+
+    .header {
+      background: #161B27;
+      border-bottom: 1px solid #1E2433;
+      padding: 18px 32px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .header-bar {
+      width: 4px; height: 40px;
+      background: #C9A96E;
+      border-radius: 2px;
+    }
+    .header-label {
+      font-size: 10px;
+      letter-spacing: 4px;
+      color: #C9A96E;
+      font-family: Calibri, sans-serif;
+      text-transform: uppercase;
+    }
+    .header-title {
+      font-size: 20px;
+      font-weight: bold;
+      margin-top: 2px;
+    }
+    .export-btn {
+      margin-left: auto;
+      background: transparent;
+      border: 1px solid #C9A96E;
+      color: #C9A96E;
+      padding: 8px 20px;
+      cursor: pointer;
+      font-family: Calibri, sans-serif;
+      font-size: 12px;
+      letter-spacing: 2px;
+      display: none;
+    }
+    .export-btn:hover { opacity: 0.8; }
+
+    .main { padding: 32px; max-width: 1100px; margin: 0 auto; }
+
+    .input-card {
+      background: #161B27;
+      border: 1px solid #1E2433;
+      padding: 28px;
+      margin-bottom: 28px;
+    }
+    .input-grid {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 24px;
+      align-items: start;
+    }
+    label {
+      display: block;
+      font-size: 10px;
+      letter-spacing: 3px;
+      color: #C9A96E;
+      font-family: Calibri, sans-serif;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+    input, textarea {
+      width: 100%;
+      background: #0F1117;
+      border: 1px solid #1E2433;
+      color: #fff;
+      padding: 10px 14px;
+      font-family: Calibri, sans-serif;
+      font-size: 14px;
+      outline: none;
+    }
+    textarea { resize: vertical; line-height: 1.8; }
+    input::placeholder, textarea::placeholder { color: #3A4055; }
+
+    .hint {
+      margin-top: 16px;
+      font-size: 11px;
+      color: #8A8FA8;
+      font-family: Calibri, sans-serif;
+      line-height: 1.7;
+    }
+    .hint strong { color: #BFC5D4; display: block; margin-bottom: 4px; }
+
+    .search-btn {
+      margin-top: 16px;
+      background: #C9A96E;
+      color: #0F1117;
+      border: none;
+      padding: 12px 32px;
+      cursor: pointer;
+      font-family: Calibri, sans-serif;
+      font-size: 12px;
+      font-weight: bold;
+      letter-spacing: 3px;
+      transition: opacity 0.2s;
+    }
+    .search-btn:disabled {
+      background: #1E2433;
+      color: #8A8FA8;
+      cursor: not-allowed;
+    }
+    .search-btn:not(:disabled):hover { opacity: 0.85; }
+
+    .error-msg { color: #E05555; font-size: 12px; margin-top: 8px; font-family: Calibri, sans-serif; }
+
+    .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+    .tab {
+      background: #161B27;
+      color: #BFC5D4;
+      border: 1px solid #1E2433;
+      padding: 6px 16px;
+      cursor: pointer;
+      font-family: Calibri, sans-serif;
+      font-size: 12px;
+      transition: all 0.15s;
+    }
+    .tab.active { background: #C9A96E; color: #0F1117; border-color: #C9A96E; }
+    .tab .warn { color: #E05555; margin-left: 6px; }
+
+    .loading-tab {
+      background: #161B27;
+      border: 1px solid #1E2433;
+      padding: 6px 16px;
+      font-family: Calibri, sans-serif;
+      font-size: 12px;
+      color: #8A8FA8;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .dot {
+      width: 8px; height: 8px;
+      background: #C9A96E;
+      border-radius: 50%;
+      animation: pulse 1s infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+    .result-card {
+      background: #161B27;
+      border: 1px solid #1E2433;
+      padding: 28px;
+    }
+
+    .result-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 24px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #1E2433;
+    }
+    .result-tipo {
+      font-size: 10px;
+      letter-spacing: 3px;
+      color: #7BB8A4;
+      font-family: Calibri, sans-serif;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .result-modelo { font-size: 22px; font-weight: bold; }
+
+    .confidence-box {
+      background: #0F1117;
+      border: 1px solid #1E2433;
+      padding: 8px 16px;
+      text-align: center;
+      min-width: 100px;
+    }
+    .confidence-label {
+      font-size: 9px;
+      letter-spacing: 2px;
+      color: #8A8FA8;
+      font-family: Calibri, sans-serif;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+    }
+    .confidence-value {
+      font-size: 13px;
+      font-weight: bold;
+      font-family: Calibri, sans-serif;
+      text-transform: uppercase;
+    }
+
+    .specs-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+    .spec-item {
+      background: #0F1117;
+      border: 1px solid #1E2433;
+      padding: 14px;
+    }
+    .spec-item.highlight { border-color: #8B6F42; }
+    .spec-item.full { grid-column: 1 / -1; }
+    .spec-label {
+      font-size: 9px;
+      letter-spacing: 2px;
+      color: #8A8FA8;
+      font-family: Calibri, sans-serif;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .spec-label.highlight { color: #C9A96E; }
+    .spec-value {
+      font-size: 14px;
+      color: #BFC5D4;
+      font-family: Calibri, sans-serif;
+      line-height: 1.6;
+    }
+
+    .source-line {
+      font-size: 11px;
+      color: #8A8FA8;
+      font-family: Calibri, sans-serif;
+      border-top: 1px solid #1E2433;
+      padding-top: 12px;
+    }
+
+    .warning-banner {
+      margin-top: 12px;
+      background: #1A1208;
+      border: 1px solid #8B6F42;
+      padding: 12px 16px;
+      font-size: 12px;
+      color: #C9A96E;
+      font-family: Calibri, sans-serif;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 40px;
+      color: #8A8FA8;
+      font-family: Calibri, sans-serif;
+      border: 1px dashed #1E2433;
+    }
+    .empty-icon { font-size: 36px; margin-bottom: 16px; opacity: 0.3; }
+    .empty-title { font-size: 15px; color: #BFC5D4; margin-bottom: 8px; }
+    .empty-sub { font-size: 12px; }
+
+    .error-state {
+      text-align: center;
+      padding: 40px;
+      color: #8A8FA8;
+      font-family: Calibri, sans-serif;
+    }
+    .error-icon { font-size: 32px; margin-bottom: 12px; color: #E05555; }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #0F1117; }
+    ::-webkit-scrollbar-thumb { background: #2A3145; border-radius: 3px; }
+
+    @media (max-width: 700px) {
+      .input-grid { grid-template-columns: 1fr; }
+      .specs-grid { grid-template-columns: 1fr; }
+      .spec-item.full { grid-column: 1; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-bar"></div>
+  <div>
+    <div class="header-label">Basil Kitchens®</div>
+    <div class="header-title">Extractor de Specs Técnicas</div>
+  </div>
+  <button class="export-btn" id="exportBtn" onclick="exportTxt()">EXPORTAR TXT</button>
+</div>
+
+<div class="main">
+  <div class="input-card">
+    <div class="input-grid">
+      <div>
+        <label>Proyecto (opcional)</label>
+        <input type="text" id="projectName" placeholder="Ej. Cóndores 440 — CL PPAL" />
+        <div class="hint">
+          <strong>Un modelo por línea. Ejemplos:</strong>
+          Smeg SOPU3304TPX<br>
+          Bosch HBL8651UC<br>
+          Miele F 2811 Vi<br>
+          Sub-Zero BI-36U/S
+        </div>
+      </div>
+      <div>
+        <label>Modelos de electrodomésticos</label>
+        <textarea id="modelInput" rows="6" placeholder="Teka DLH 982 T&#10;Teka EFX 90.1 6G AI AL 2DR CI&#10;Smeg STL372QSMX"></textarea>
+        <div id="errorMsg" class="error-msg"></div>
+        <button class="search-btn" id="searchBtn" onclick="startSearch()">BUSCAR SPECS</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="resultsArea"></div>
+</div>
+
+<script>
+  let allResults = [];
+  let activeModel = null;
+
+  const FIELD_CONFIG = [
+    { key: 'dimensiones_instalacion', label: 'Dimensiones de instalación', highlight: true },
+    { key: 'espacios_libres', label: 'Espacios libres requeridos', highlight: false },
+    { key: 'tipo_conexion', label: 'Tipo de conexión', highlight: false },
+    { key: 'voltaje', label: 'Voltaje / Potencia', highlight: false },
+    { key: 'apertura_puerta', label: 'Apertura de puerta / acceso', highlight: false },
+    { key: 'restricciones_especiales', label: 'Restricciones especiales', highlight: false, full: true },
+    { key: 'notas_fabricacion', label: 'Notas para fabricación', highlight: true, full: true },
+  ];
+
+  function confidenceColor(c) {
+    if (c === 'alta') return '#4CAF7D';
+    if (c === 'media') return '#C9A96E';
+    return '#E05555';
+  }
+
+  async function fetchSpecs(model) {
+    const res = await fetch('/api/specs', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model }),
+    });
+    return await res.json();
+  }
+
+  async function startSearch() {
+    const input = document.getElementById('modelInput').value.trim();
+    if (!input) {
+      document.getElementById('errorMsg').textContent = 'Ingresa al menos un modelo.';
+      return;
+    }
+    document.getElementById('errorMsg').textContent = '';
+
+    const models = input.split('\n').map(l => l.trim()).filter(l => l.length > 2);
+    allResults = [];
+    activeModel = null;
+
+    document.getElementById('searchBtn').disabled = true;
+    document.getElementById('exportBtn').style.display = 'none';
+    renderResults();
+
+    for (const model of models) {
+      renderLoading(model);
+      try {
+        const data = await fetchSpecs(model);
+        allResults.push({ model, specs: data.specs, raw: data.raw, error: data.error || null });
+      } catch (err) {
+        allResults.push({ model, specs: null, error: err.message });
+      }
+      if (!activeModel) activeModel = allResults[0].model;
+      renderResults();
+    }
+
+    document.getElementById('searchBtn').disabled = false;
+    document.getElementById('exportBtn').style.display = allResults.length ? 'block' : 'none';
+  }
+
+  let loadingModel = null;
+  function renderLoading(model) {
+    loadingModel = model;
+    renderResults();
+  }
+
+  function renderResults() {
+    const area = document.getElementById('resultsArea');
+    if (!allResults.length && !loadingModel) {
+      area.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon">⌕</div>
+          <div class="empty-title">Ingresa los modelos del proyecto y presiona Buscar Specs</div>
+          <div class="empty-sub">El sistema buscará fichas técnicas en tiempo real para cada equipo</div>
+        </div>`;
+      return;
+    }
+
+    // Tabs
+    let tabsHtml = '<div class="tabs">';
+    allResults.forEach(r => {
+      const label = r.specs?.tipo ? `${r.specs.tipo} · ${r.specs.marca || r.model}` : r.model;
+      const warn = (!r.specs && !loadingModel) ? '<span class="warn">⚠</span>' : '';
+      const active = activeModel === r.model ? 'active' : '';
+      tabsHtml += `<button class="tab ${active}" onclick="setActive('${r.model}')">${label}${warn}</button>`;
+    });
+    if (loadingModel) {
+      tabsHtml += `<div class="loading-tab"><div class="dot"></div>Buscando ${loadingModel}...</div>`;
+    }
+    tabsHtml += '</div>';
+
+    // Active result
+    const active = allResults.find(r => r.model === activeModel);
+    let detailHtml = '';
+    if (active) {
+      if (active.specs) {
+        const conf = active.specs.confianza || '—';
+        const confColor = confidenceColor(conf);
+
+        let specsGrid = '<div class="specs-grid">';
+        FIELD_CONFIG.forEach(f => {
+          const val = active.specs[f.key];
+          if (!val || val === 'No especificado') return;
+          const hlClass = f.highlight ? 'highlight' : '';
+          const fullClass = f.full ? 'full' : '';
+          specsGrid += `
+            <div class="spec-item ${hlClass} ${fullClass}">
+              <div class="spec-label ${hlClass}">${f.label}</div>
+              <div class="spec-value">${val}</div>
+            </div>`;
+        });
+        specsGrid += '</div>';
+
+        const warnBanner = conf !== 'alta' ? `
+          <div class="warning-banner">
+            ⚠ Confianza ${conf}. Verificar contra ficha técnica oficial del fabricante antes de fabricar.
+          </div>` : '';
+
+        const source = active.specs.fuente ? `<div class="source-line">Fuente: ${active.specs.fuente}</div>` : '';
+
+        detailHtml = `
+          <div class="result-card">
+            <div class="result-header">
+              <div>
+                <div class="result-tipo">${active.specs.tipo || 'Electrodoméstico'}</div>
+                <div class="result-modelo">${active.specs.marca || ''} ${active.specs.modelo || active.model}</div>
+              </div>
+              <div class="confidence-box">
+                <div class="confidence-label">Confianza</div>
+                <div class="confidence-value" style="color:${confColor}">${conf}</div>
+              </div>
+            </div>
+            ${specsGrid}
+            ${source}
+            ${warnBanner}
+          </div>`;
+      } else {
+        detailHtml = `
+          <div class="result-card">
+            <div class="error-state">
+              <div class="error-icon">⚠</div>
+              <div style="font-size:14px;color:#BFC5D4;margin-bottom:6px">No se pudieron obtener specs para:</div>
+              <div style="font-size:16px;font-weight:bold;color:#fff;margin-bottom:12px">${active.model}</div>
+              <div style="font-size:12px">Verifica que el modelo sea correcto o busca manualmente en el sitio del fabricante.</div>
+            </div>
+          </div>`;
+      }
+    }
+
+    area.innerHTML = tabsHtml + detailHtml;
+  }
+
+  function setActive(model) {
+    activeModel = model;
+    renderResults();
+  }
+
+  function exportTxt() {
+    const project = document.getElementById('projectName').value;
+    let out = 'BASIL KITCHENS® — SPECS TÉCNICAS\n';
+    if (project) out += `Proyecto: ${project}\n`;
+    out += `Generado: ${new Date().toLocaleDateString('es-MX')}\n\n${'='.repeat(60)}\n\n`;
+
+    allResults.forEach(r => {
+      out += `MODELO: ${r.model}\n`;
+      if (r.specs) {
+        out += `Tipo: ${r.specs.tipo || '-'}\nMarca: ${r.specs.marca || '-'}\n\n`;
+        FIELD_CONFIG.forEach(f => {
+          if (r.specs[f.key] && r.specs[f.key] !== 'No especificado') {
+            out += `${f.label}:\n  ${r.specs[f.key]}\n\n`;
+          }
+        });
+        if (r.specs.fuente) out += `Fuente: ${r.specs.fuente}\n`;
+        if (r.specs.confianza) out += `Confianza: ${r.specs.confianza}\n`;
+      } else {
+        out += `Error: ${r.error || 'Sin datos'}\n`;
+      }
+      out += `\n${'-'.repeat(60)}\n\n`;
+    });
+
+    const a = document.createElement('a');
+    a.href = 'data:text/plain;charset=utf-8,' + encodeURIComponent(out);
+    a.download = `specs_${project || 'proyecto'}_${Date.now()}.txt`;
+    a.click();
+  }
+
+  // Initial render
+  renderResults();
+</script>
+</body>
+</html>
