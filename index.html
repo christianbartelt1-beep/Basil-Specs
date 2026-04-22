@@ -334,7 +334,7 @@
   }
 
   async function fetchSpecs(model) {
-    const res = await fetch('/api/specs', {
+  const r = await fetch('https://black-truth-1b79.christian-bartelt.workers.dev/api/specs', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ model }),
